@@ -1,0 +1,25 @@
+{
+  "manifestVersion": 2,
+  "name": "PeekABoo",
+  "version": "3.0.1",
+  "author": "YandrosTheSane",
+  "description": "Fixes concealment icon leaking hidden enemy positions. Enemies that shoot at you are briefly revealed then fade back to last known position.",
+  "loadOrder": 100,
+  "patches": {},
+  "assets": {},
+  "code": {
+    "sources": [
+      "src/PeekABooPlugin.cs"
+    ],
+    "references": [
+      "MelonLoader",
+      "0Harmony",
+      "Il2CppInterop.Runtime",
+      "Il2Cppmscorlib",
+      "Assembly-CSharp",
+      "Menace.ModpackLoader"
+    ],
+    "prebuiltDlls": []
+  },
+  "securityStatus": "SourceVerified"
+}
