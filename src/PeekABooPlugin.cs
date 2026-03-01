@@ -16,6 +16,7 @@ public class PeekABooPlugin : IModpackPlugin
     private int _initDelay;
 
     private const string MOD_NAME = "PeekABoo";
+    private const string MOD_VERSION = "3.0.2";
 
     // Player faction IDs
     private const int FACTION_PLAYER_1 = 1;
@@ -48,7 +49,7 @@ public class PeekABooPlugin : IModpackPlugin
     {
         Log = logger;
         RegisterSettings();
-        Log.Msg("PeekABoo v3.0.1 initialized (freeze mode, throttled)");
+        Log.Msg($"PeekABoo v{MOD_VERSION} initialized (freeze mode, throttled)");
     }
 
     public void OnSceneLoaded(int buildIndex, string sceneName)
@@ -60,7 +61,7 @@ public class PeekABooPlugin : IModpackPlugin
             _tickCounter = 0;
             _guardCache.Clear();
             MelonCoroutines.Start(ConcealmentGuardCoroutine());
-            Log.Msg("PeekABoo v3.0.1 — Concealment guard armed");
+            Log.Msg($"PeekABoo v{MOD_VERSION} — Concealment guard armed");
         }
         else
         {
@@ -79,7 +80,7 @@ public class PeekABooPlugin : IModpackPlugin
     {
         ModSettings.Register(MOD_NAME, settings =>
         {
-            settings.AddHeader("Debug");
+            settings.AddHeader($"PeekABoo v{MOD_VERSION}");
             settings.AddToggle("DebugLogging", "Debug Logging", false);
         });
     }
