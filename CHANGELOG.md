@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.0.2 -- Housekeeping
+
+### Changed
+
+- Removed the Hide Concealment from Undetected toggle from settings (mod is always active when installed). Only Debug Logging remains as a setting.
+- Added release script and .gitignore for release artifacts.
+- Restructured README with complementary mod links and documentation.
+
 ## v3.0.1 -- Performance & Observability
 
 ### Changed

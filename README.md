@@ -1,14 +1,21 @@
-# PeekABoo -- Concealment Exploit Fix
+# PeekABoo — Concealment Icon Exploit Fix
 
-Hi there :)
+**Version:** 3.0.1 — *"Freeze mode, throttled"*
+**Author:** YandrosTheSane
 
-Here are the details in a more human friendly way. English not being my FL I apologise if the reading isn't fluid.
+## What It Does
+
+PeekABoo fixes a UI information leak that lets the player detect hidden enemies through the concealment icon. 
+
+Without this mod, the concealment icon disappears whenever any enemy gains line of sight to your unit — even if that enemy is deep in the fog of war and completely invisible to you. 
+
+The disappearing icon gives you free intel you shouldn't have.
 
 ## The Problem
 
-In vanilla Menace, the concealment icon leaks information about enemies you can't see.
+When an enemy spots your unit, the game removes the concealment icon by setting `Actor.m_VisibilityToAI` to Visible. It never checks whether the player can actually see that enemy.
 
-When an enemy spots your unit, the game removes the concealment icon -- even if that enemy is outside your vision range and completely hidden in the fog of war. The disappearing icon tells you "someone is watching from that direction," giving you free intel you shouldn't have.
+The result: a hidden enemy 9 tiles away (outside your vision range of 7) spots you, and your concealment icon disappears — telling you "someone is watching from that direction."
 
 ### Meta information abuse
 
@@ -23,23 +30,22 @@ You can't see the enemy. But your concealment icon disappears,
 revealing their presence.
 ```
 
-If you move closer (within your own vision range), the enemy becomes visible and the icon legitimately isn't there -- that should be (according to the I decide it so rule) normal behavior.
+If you move closer (within your own vision range), the enemy becomes visible and the icon legitimately isn't there — that's normal behavior.
 
-## Root Cause (as far as I can tell for now)
+### Root Cause
 
 The concealment icon is driven by `Actor.m_VisibilityToAI`:
 
 | Value | Meaning |
 |-------|---------|
-| Visible (1) | Icon removed -- "enemies can see you" |
-| Hidden (2) | Icon shown -- "you are concealed" |
+| Visible (1) | Icon removed — "enemies can see you" |
+| Hidden (2) | Icon shown — "you are concealed" |
 
-The game sets this to Visible whenever any enemy gains line of sight to your unit -- it doesn't check whether you can actually see that enemy.
-This is the "bug".
+The game sets this to Visible whenever any enemy gains line of sight to your unit — it doesn't check whether you can actually see that enemy.
 
-## The Fix (Freeze Mode)
+## How It Currently Works
 
-Trying to set the value during a turn caused horrible flicker of the icon so the solution to save the player eyes was to invert the logic and instead of making the icon reappear we make it dissapear only if you have line of sight on one opfor.
+### Core Mechanism: Freeze Mode
 
 PeekABoo takes full control of `m_VisibilityToAI` and forces it to the correct value:
 
@@ -49,12 +55,12 @@ PeekABoo takes full control of `m_VisibilityToAI` and forces it to the correct v
 4. If a visible/detected enemy sees you -> allow icon removal (you know they're there)
 5. If only hidden enemies see you -> force concealment icon to stay (no free intel)
 
-### Performance (v3.0.1)
+### Performance
 
 The expensive LOS scan (iterating all player x enemy pairs) no longer runs every frame. Instead the mod separates the work into two parts:
 
 - **Recompute** (every 5 frames): full LOS scan, rebuilds a cache of per-unit visibility results
-- **Apply** (every frame, dual-pass): sets `m_VisibilityToAI` from cache -- no LOS calls, essentially free
+- **Apply** (every frame, dual-pass): sets `m_VisibilityToAI` from cache — no LOS calls, essentially free
 
 The dual-pass apply (OnUpdate + coroutine) is kept to prevent flicker from game overwrites between Unity update phases.
 
@@ -67,51 +73,75 @@ Measured with 1 player unit and 38 enemies:
 
 At 60fps a frame budget is 16.6ms. The mod uses ~0.15ms every 5th frame and ~0.001ms on the others.
 
-### Gameplay effect
+### Gameplay Effect
 
-As a side effect of the throttled scan, enemy visibility during their turn now behaves in a more natural way. When an enemy outside your vision takes an offensive action against your unit (e.g. shooting), the game briefly flips their visibility state -- the mod picks this up and you see the action play out. Once the action ends their position is lost and reverts to a "last known position" marker. You get to see what happened to your unit but you don't get to keep tracking the enemy afterwards.
+As a side effect of the throttled scan, enemy visibility during their turn now behaves in a more natural way. When an enemy outside your vision takes an offensive action against your unit (e.g. shooting), the game briefly flips their visibility state — the mod picks this up and you see the action play out. Once the action ends their position is lost and reverts to a "last known position" marker. You get to see what happened to your unit but you don't get to keep tracking the enemy afterwards.
 
 This feels like the right tactical experience: you know you got shot at and from where, but the enemy fades back into the fog of war.
 
-### Is AI behavior impacted?
+### Is AI Behavior Impacted?
 
-As far as I can tell `m_VisibilityToAI` is UI-only it does not affect AI firing behavior. I verified this by forcing it to Hidden while a visible enemy had line of sight, then ending the turn. The enemy still fired The AI uses `CanActorSee()` directly for targeting, not this field.
+As far as I can tell `m_VisibilityToAI` is UI-only — it does not affect AI firing behavior. I verified this by forcing it to Hidden while a visible enemy had line of sight, then ending the turn. The enemy still fired. The AI uses `CanActorSee()` directly for targeting, not this field.
 
----
+## Complementary Mods
+
+- [BooAPeek ~ By YandrosTheSane](https://www.nexusmods.com/menace/mods/73) — Fixes the mirror-image problem: the AI's illegitimate knowledge of concealed *player* positions. Without it, enemies flee from and take cover against units they've never seen.
+- [Wake Up ~ By Pylkij](https://www.nexusmods.com/menace/mods/36)
+
+With those 3 mods (AI is active, You don't get free intel, They don't get free intel) you can get into situation like this in one turn.
+
+Later down the road there will be a need for rebalance.
+
+## Installation
+
+Use the https://github.com/p0ss/MenaceAssetPacker/releases to deploy (build the sources) and activate the mod.
+
+## Current State & Known Limitations
+
+### What v3.0.1 Does Well
+
+- Eliminates the player's illegitimate knowledge of hidden enemy positions via the concealment icon
+- Concealment icon only changes when a visible/detected enemy has LOS — no more free intel from fog-of-war enemies
+- Enemy offensive actions are briefly revealed then fade back to last-known-position markers
+- Negligible performance impact (~0.15ms every 5th frame)
+- Stable across all tested scenarios — no flicker, no crashes
+
+### What v3.0.1 Does NOT Do
+
+- **Not a full fog-of-war system:** PeekABoo only controls the concealment icon (`m_VisibilityToAI`). Other UI elements that might leak information are not addressed.
+- **5-frame scan delay:** The LOS cache can be up to 5 frames stale. In practice this is imperceptible (~83ms at 60fps).
+
+## Settings
+
+Configurable via the in-game Modkit settings panel:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **Debug Logging** | Off | Logs periodic perf summaries with recompute/apply timings and actor counts |
+
+## Investigation & Testing
+
+Five approaches were tested before arriving at the current freeze mode. Full investigation details, ruled-out fixes, SDK methods reference, visibility states, and performance benchmarks in [docs/CONCEALMENT_ANALYSIS.md](docs/CONCEALMENT_ANALYSIS.md).
+
+## File Structure
+
+```
+PeekABoo-modpack/
+├── modpack.json              # Mod metadata and load order
+├── src/
+│   └── PeekABooPlugin.cs    # Plugin source (IModpackPlugin)
+├── docs/
+│   └── CONCEALMENT_ANALYSIS.md  # Full investigation with ruled-out fixes and SDK reference
+├── CHANGELOG.md              # Version history
+└── README.md                 # This file
+```
 
 ## Credits
-https://github.com/p0ss/MenaceAssetPacker without that I wouldn't have dreamed to do this fix.
-"Emo Used HM01" for https://www.nexusmods.com/menace/mods/16 with a comprehensive structure for modders.
 
-## Modding knowledge Gained
+- **MenaceAssetPacker** — https://github.com/p0ss/MenaceAssetPacker — without that I wouldn't have dreamed to do this fix
+- **"Emo Used HM01"** — https://www.nexusmods.com/menace/mods/16 — comprehensive modding structure for modders
 
-Beware that all of this has been infered by Claude as there was a lot of poking around. If this help any of you it's a net benefit but don't take it to heart and check for yourself.
+## Requirements
 
-### Visibility states
-
-| Value | Name | Meaning |
-|-------|------|---------|
-| 0 | Unknown | Not yet evaluated |
-| 1 | Visible | Player can see this actor |
-| 2 | Hidden | In fog of war |
-| 3 | Detected | Radar blip, not directly seen |
-
-### SDK methods used
-
-| Method | Purpose |
-|--------|---------|
-| `EntitySpawner.ListEntities(-1)` | Get all actors across all factions |
-| `GameObj.ReadInt("m_FactionID")` | Identify player (1/2) vs enemy factions |
-| `GameObj.As<Actor>().m_VisibilityToAI` | Read/write the concealment icon state |
-| `LineOfSight.CanActorSee(enemy, player)` | Check if enemy has LOS to player (directional) |
-| `LineOfSight.GetVisibilityState(enemy)` | Check if player can see the enemy |
-
-### What did NOT work (investigated dead ends)
-
-| Approach | Why I think It Failed |
-|----------|---------------|
-| Harmony prefix on `OnDiscovered` | Native IL2CPP dispatch bypasses managed Harmony patches |
-| Checking `m_DiscoveredMask` | Tracks discovery history, does not drive the icon |
-| `GameObj.GetName()` on actors | Returns null -- must use `ReadObj("m_Template").GetName()` |
-| `ReadInt("VisibilityState")` | Resolves to wrong memory offset; must use `LineOfSight.GetVisibilityState()` |
-| Reactive polling (set Hidden only when game sets Visible) | Flickers during movement/abilities |
+- Menace with MelonLoader
+- Menace ModpackLoader

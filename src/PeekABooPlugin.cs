@@ -73,16 +73,12 @@ public class PeekABooPlugin : IModpackPlugin
     //  Settings
     // ═══════════════════════════════════════════════════════════════════
 
-    private static bool HideConcealmentEnabled => ModSettings.Get<bool>(MOD_NAME, "HideConcealmentFromUndetected");
     private static bool DebugLogging => ModSettings.Get<bool>(MOD_NAME, "DebugLogging");
 
     private void RegisterSettings()
     {
         ModSettings.Register(MOD_NAME, settings =>
         {
-            settings.AddHeader("Concealment Fix");
-            settings.AddToggle("HideConcealmentFromUndetected", "Hide Concealment from Undetected", true);
-
             settings.AddHeader("Debug");
             settings.AddToggle("DebugLogging", "Debug Logging", false);
         });
@@ -97,7 +93,7 @@ public class PeekABooPlugin : IModpackPlugin
 
     public void OnUpdate()
     {
-        if (!_inTactical || !HideConcealmentEnabled || _initDelay > 0)
+        if (!_inTactical || _initDelay > 0)
         {
             if (_initDelay > 0) _initDelay--;
             return;
@@ -151,7 +147,7 @@ public class PeekABooPlugin : IModpackPlugin
         {
             yield return null;
 
-            if (!_inTactical || !HideConcealmentEnabled)
+            if (!_inTactical)
                 continue;
 
             ApplyCachedConcealment();

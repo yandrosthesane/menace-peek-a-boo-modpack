@@ -1,7 +1,7 @@
 {
   "manifestVersion": 2,
   "name": "PeekABoo",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "author": "YandrosTheSane",
   "description": "Fixes concealment icon leaking hidden enemy positions. Enemies that shoot at you are briefly revealed then fade back to last known position.",
   "loadOrder": 100,
