@@ -1,6 +1,6 @@
 # PeekABoo — Concealment Icon Exploit Fix
 
-**Version:** 3.0.1 — *"Freeze mode, throttled"*
+**Version:** 3.0.2 — *"Freeze mode, throttled"*
 **Author:** YandrosTheSane
 
 ## What It Does
@@ -98,7 +98,7 @@ Use the https://github.com/p0ss/MenaceAssetPacker/releases to deploy (build the 
 
 ## Current State & Known Limitations
 
-### What v3.0.1 Does Well
+### What v3.0.2 Does Well
 
 - Eliminates the player's illegitimate knowledge of hidden enemy positions via the concealment icon
 - Concealment icon only changes when a visible/detected enemy has LOS — no more free intel from fog-of-war enemies
@@ -106,7 +106,7 @@ Use the https://github.com/p0ss/MenaceAssetPacker/releases to deploy (build the 
 - Negligible performance impact (~0.15ms every 5th frame)
 - Stable across all tested scenarios — no flicker, no crashes
 
-### What v3.0.1 Does NOT Do
+### What v3.0.2 Does NOT Do
 
 - **Not a full fog-of-war system:** PeekABoo only controls the concealment icon (`m_VisibilityToAI`). Other UI elements that might leak information are not addressed.
 - **5-frame scan delay:** The LOS cache can be up to 5 frames stale. In practice this is imperceptible (~83ms at 60fps).
@@ -131,8 +131,11 @@ PeekABoo-modpack/
 ├── src/
 │   └── PeekABooPlugin.cs    # Plugin source (IModpackPlugin)
 ├── docs/
-│   └── CONCEALMENT_ANALYSIS.md  # Full investigation with ruled-out fixes and SDK reference
+│   ├── CONCEALMENT_ANALYSIS.md  # Full investigation with ruled-out fixes and SDK reference
+│   └── README.bbcode.txt     # BBCode version for Nexus
+├── media/                    # Screenshots for Nexus (not in release zip)
 ├── CHANGELOG.md              # Version history
+├── release.sh                # Build release zip
 └── README.md                 # This file
 ```
 

@@ -1,6 +1,6 @@
 [size=5][b]PeekABoo — Concealment Icon Exploit Fix[/b][/size]
 
-[b]Version:[/b] 3.0.1 — [i]"Freeze mode, throttled"[/i]
+[b]Version:[/b] 3.0.2 — [i]"Freeze mode, throttled"[/i]
 [b]Author:[/b] YandrosTheSane
 
 [size=4][b]What It Does[/b][/size]
@@ -98,7 +98,7 @@ Use the [url=https://github.com/p0ss/MenaceAssetPacker/releases]MenaceAssetPacke
 
 [size=4][b]Current State & Known Limitations[/b][/size]
 
-[size=3][b]What v3.0.1 Does Well[/b][/size]
+[size=3][b]What v3.0.2 Does Well[/b][/size]
 
 [list]
 [*]Eliminates the player's illegitimate knowledge of hidden enemy positions via the concealment icon
@@ -108,7 +108,7 @@ Use the [url=https://github.com/p0ss/MenaceAssetPacker/releases]MenaceAssetPacke
 [*]Stable across all tested scenarios — no flicker, no crashes
 [/list]
 
-[size=3][b]What v3.0.1 Does NOT Do[/b][/size]
+[size=3][b]What v3.0.2 Does NOT Do[/b][/size]
 
 [list]
 [*][b]Not a full fog-of-war system:[/b] PeekABoo only controls the concealment icon. Other UI elements that might leak information are not addressed.
@@ -120,9 +120,10 @@ Use the [url=https://github.com/p0ss/MenaceAssetPacker/releases]MenaceAssetPacke
 Configurable via the in-game Modkit settings panel:
 
 [list]
-[*][b]Hide Concealment from Undetected[/b] (Default: On) — Master toggle for the concealment icon fix
 [*][b]Debug Logging[/b] (Default: Off) — Logs periodic perf summaries with recompute/apply timings and actor counts
 [/list]
+
+The settings header shows the mod version (e.g. "PeekABoo v3.0.2") so you can verify which version is deployed.
 
 [size=4][b]Credits[/b][/size]
 
